@@ -97,40 +97,28 @@ npm start
 
 Frontend runs at **http://localhost:3000**.
 
-### 4. Create first Admin user
+### 4. Admin user (auto-created)
 
-The app does not seed users. Create an admin via API (e.g. Postman) or a one-time script:
+On startup, **after MongoDB connects**, the backend will **automatically ensure there is at least one admin user**.
 
-**Option A – Postman / curl**
+By default, it uses the values from `backend/.env`:
 
-```bash
-POST http://localhost:5000/api/auth/register
-Content-Type: application/json
-
-{
-  "name": "Admin",
-  "email": "admin@exam.com",
-  "password": "admin123",
-  "role": "admin"
-}
+```env
+ADMIN_NAME=Admin
+ADMIN_EMAIL=admin@email.com
+ADMIN_PASSWORD=admin123
 ```
 
-**Option B – Node one-liner (run from project root)**
+If no admin with `ADMIN_EMAIL` exists, it will be created and you will see a log similar to:
 
-```bash
-cd backend && node -e "
-require('dotenv').config();
-const mongoose = require('mongoose');
-const User = require('./models/User');
-mongoose.connect(process.env.MONGO_URI).then(async () => {
-  const u = await User.create({ name: 'Admin', email: 'admin@exam.com', password: 'admin123', role: 'admin' });
-  console.log('Admin created:', u.email);
-  process.exit(0);
-});
-"
+```text
+MongoDB Connected: ...
+Default admin created. Email: admin@email.com, Password: admin123
 ```
 
-Then log in at **http://localhost:3000/admin/login** with `admin@exam.com` / `admin123`.
+You can then log in at **http://localhost:3000/admin/login** with those credentials.
+
+> In production, change these admin values in `.env` to something secure.
 
 ### 5. Create a User (candidate)
 
