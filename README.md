@@ -60,18 +60,15 @@ copy .env.example .env   # Windows
 ```
 
 Edit `.env` and set:
-
-- `MONGO_URI` – your MongoDB connection string (e.g. `mongodb://localhost:27017/online_exam`)
 - `JWT_SECRET` – a strong random string for JWT signing
-- `PORT` – optional, default 5000
-
+  
 Start the server:
 
 ```bash
 npm run dev
 ```
 
-Server runs at **http://localhost:5000**. API base: **http://localhost:5000/api**.
+Server runs at **http://********. API base: **http://*********/api**.
 
 ### 3. Frontend setup
 
@@ -86,7 +83,7 @@ Optional: create `.env` from example and set API URL if different:
 
 ```bash
 copy .env.example .env   # Windows
-# Set REACT_APP_API_URL=http://localhost:5000/api if needed
+# Set REACT_APP_API_URL=http://**********/api if needed
 ```
 
 Start the React app:
@@ -95,30 +92,11 @@ Start the React app:
 npm start
 ```
 
-Frontend runs at **http://localhost:3000**.
-
-### 4. Admin user (auto-created)
-
-On startup, **after MongoDB connects**, the backend will **automatically ensure there is at least one admin user**.
-
-By default, it uses the values from `backend/.env`:
-
-
-
-If no admin with `ADMIN_EMAIL` exists, it will be created and you will see a log similar to:
-
-```text
-MongoDB Connected: ...
-Default admin created. Email: admin@email.com, Password: admin123
-```
-
-You can then log in at **http://localhost:3000/admin/login** with those credentials.
-
-> In production, change these admin values in `.env` to something secure.
+Frontend runs at **http:********.
 
 ### 5. Create a User (candidate)
 
-- Go to **http://localhost:3000/register**
+- Go to **http://*********/register**
 - Register with name, email, password (role is user by default)
 
 ### 6. Typical flow
