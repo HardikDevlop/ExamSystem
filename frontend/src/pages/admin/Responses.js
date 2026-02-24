@@ -2,7 +2,12 @@
  * View submitted responses and Get Score button
  */
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { AdminLayout } from '../../components/layout/AdminLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Skeleton } from '../../components/ui/Skeleton';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { getResponses, getScore } from '../../services/api';
 
 export default function Responses() {
@@ -10,13 +15,16 @@ export default function Responses() {
   const [loading, setLoading] = useState(true);
   const [scoringId, setScoringId] = useState(null);
   const [error, setError] = useState('');
+  const [confirmScoreId, setConfirmScoreId] = useState(null);
 
   const fetchResponses = async () => {
     try {
       const { data } = await getResponses();
       setResponses(data);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to load responses');
+      const msg = err.response?.data?.message || 'Failed to load responses';
+      setError(msg);
+      toast.error(msg);
     }
     setLoading(false);
   };
@@ -30,56 +38,93 @@ export default function Responses() {
     setError('');
     try {
       await getScore(responseId);
+      toast.success('Score calculated for this response.');
       await fetchResponses();
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to calculate score');
+      const msg = err.response?.data?.message || 'Failed to calculate score';
+      setError(msg);
+      toast.error(msg);
     }
     setScoringId(null);
   };
 
   return (
-    <>
-      <nav className="navbar">
-        <span>Submissions & Score</span>
-        <Link to="/admin/dashboard" className="btn btn-secondary" style={{ color: '#fff' }}>Dashboard</Link>
-      </nav>
-      <div className="container">
-        <h1 className="page-title">Submitted Responses</h1>
-        {error && <p className="error-msg">{error}</p>}
-        {loading && <p>Loading...</p>}
-        {!loading && responses.length === 0 && (
-          <div className="card"><p>No submissions yet.</p></div>
-        )}
-        {!loading && responses.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {responses.map((r) => (
-              <div key={r._id} className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                  <strong>{r.userId?.name}</strong> ({r.userId?.email}) — <em>{r.examId?.title}</em>
-                  <br />
-                  <span style={{ fontSize: '0.875rem', color: '#64748b' }}>
-                    Submitted: {new Date(r.createdAt).toLocaleString()}
-                    {r.score !== null && ` • Score: ${r.score}/${r.totalMarks}`}
-                  </span>
+    <AdminLayout title="Responses">
+      <Card>
+        <CardHeader>
+          <CardTitle>Submitted Responses</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {error && (
+            <p className="mb-2 text-xs text-red-600 dark:text-red-400">
+              {error}
+            </p>
+          )}
+          {loading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : responses.length === 0 ? (
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              No submissions yet.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-2 text-xs">
+              {responses.map((r) => (
+                <div
+                  key={r._id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                >
+                  <div>
+                    <p className="font-semibold text-slate-900 dark:text-slate-50">
+                      {r.userId?.name} ({r.userId?.email})
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {r.examId?.title}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Submitted: {new Date(r.createdAt).toLocaleString()}
+                      {r.score !== null &&
+                        ` • Score: ${r.score}/${r.totalMarks}`}
+                    </p>
+                  </div>
+                  <div>
+                    {r.score === null ? (
+                      <Button
+                        size="sm"
+                        onClick={() => setConfirmScoreId(r._id)}
+                        disabled={scoringId !== null}
+                      >
+                        {scoringId === r._id ? 'Calculating…' : 'Get Score'}
+                      </Button>
+                    ) : (
+                      <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                        Evaluated
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  {r.score === null ? (
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handleGetScore(r._id)}
-                      disabled={scoringId !== null}
-                    >
-                      {scoringId === r._id ? 'Calculating...' : 'Get Score'}
-                    </button>
-                  ) : (
-                    <span className="success-msg">Evaluated</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <ConfirmDialog
+        open={!!confirmScoreId}
+        title="Calculate score for this response?"
+        description="The system will evaluate the answers and save the score."
+        confirmLabel="Get score"
+        cancelLabel="Cancel"
+        onConfirm={async () => {
+          const id = confirmScoreId;
+          setConfirmScoreId(null);
+          if (id) {
+            await handleGetScore(id);
+          }
+        }}
+        onCancel={() => setConfirmScoreId(null)}
+      />
+    </AdminLayout>
   );
 }

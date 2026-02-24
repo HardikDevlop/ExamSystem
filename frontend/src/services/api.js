@@ -26,6 +26,12 @@ export const login = (data) => api.post('/auth/login', data);
 // Admin APIs (requires admin token)
 export const createExam = (data) => api.post('/admin/exam', data);
 export const addQuestion = (data) => api.post('/admin/question', data);
+export const uploadQuestions = (formData) =>
+  api.post('/admin/upload-questions', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+export const getAdminExamDetail = (id) => api.get(`/admin/exam/${id}`);
+export const deleteExam = (id) => api.delete(`/admin/exam/${id}`);
 export const assignExam = (data) => api.post('/admin/assign', data);
 export const getResponses = (params) => api.get('/admin/responses', { params });
 export const getScore = (responseId) => api.post('/admin/get-score', { responseId });

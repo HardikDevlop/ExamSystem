@@ -1,8 +1,10 @@
 /**
- * User Login page
+ * User Login page - modern UI with background image
  */
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { login } from '../services/api';
 
 export default function Login() {
@@ -27,49 +29,104 @@ export default function Login() {
       localStorage.setItem('userId', data._id);
       localStorage.setItem('userName', data.name);
       localStorage.setItem('role', data.role);
+      toast.success(`Welcome back, ${data.name.split(' ')[0]}!`);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      const msg = err.response?.data?.message || 'Login failed';
+      setError(msg);
+      toast.error('Invalid email or password');
     }
     setLoading(false);
   };
 
   return (
-    <div className="container" style={{ maxWidth: 400, marginTop: '3rem' }}>
-      <div className="card">
-        <h1 className="page-title">User Login</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="your@email.com"
-            />
+    <div
+      className="min-h-screen bg-slate-950 text-slate-50"
+      style={{
+        backgroundImage:
+          'linear-gradient(to bottom right, rgba(15,23,42,0.85), rgba(15,23,42,0.9)), url("https://images.pexels.com/photos/4143791/pexels-photo-4143791.jpeg?auto=compress&cs=tinysrgb&w=1600")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="flex min-h-screen items-center justify-center px-4 py-8">
+        <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-soft backdrop-blur-md">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-soft">
+              <UserCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-400">
+                Online Examination System
+              </p>
+              <h1 className="text-lg font-semibold text-white">
+                Candidate Login
+              </h1>
+            </div>
           </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
-          {error && <p className="error-msg">{error}</p>}
-          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: '100%' }}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-          Don't have an account? <Link to="/register">Register</Link>
-        </p>
-        <p style={{ textAlign: 'center', marginTop: '0.5rem' }}>
-          <Link to="/admin/login">Admin Login</Link>
-        </p>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1 text-sm">
+              <label className="block text-xs font-medium text-slate-300">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+                className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+              />
+            </div>
+            <div className="space-y-1 text-sm">
+              <label className="block text-xs font-medium text-slate-300">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-50 placeholder:text-slate-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/40"
+              />
+            </div>
+
+            {error && (
+              <p className="text-xs text-red-400">
+                {error}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-soft transition hover:bg-primary-500 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? 'Logging in…' : 'Login'}
+            </button>
+          </form>
+
+          <p className="mt-4 text-center text-xs text-slate-400">
+            Don&apos;t have an account?{' '}
+            <Link
+              to="/register"
+              className="font-medium text-primary-300 hover:text-primary-200"
+            >
+              Register
+            </Link>
+          </p>
+          <p className="mt-1 text-center text-xs text-slate-400">
+            Are you an admin?{' '}
+            <Link
+              to="/admin/login"
+              className="font-medium text-primary-300 hover:text-primary-200"
+            >
+              Go to admin login
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

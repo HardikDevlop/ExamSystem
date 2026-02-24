@@ -19,6 +19,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import CreateExam from './pages/admin/CreateExam';
 import AssignExam from './pages/admin/AssignExam';
 import Responses from './pages/admin/Responses';
+import AdminExams from './pages/admin/AdminExams';
 
 // Protected route wrapper - redirect to login if no token or wrong role
 const UserRoute = ({ children }) => {
@@ -85,6 +86,14 @@ function App() {
         element={
           <AdminRoute>
             <CreateExam />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/exams"
+        element={
+          <AdminRoute>
+            <AdminExams />
           </AdminRoute>
         }
       />

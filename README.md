@@ -103,11 +103,7 @@ On startup, **after MongoDB connects**, the backend will **automatically ensure 
 
 By default, it uses the values from `backend/.env`:
 
-```env
-ADMIN_NAME=Admin
-ADMIN_EMAIL=admin@email.com
-ADMIN_PASSWORD=admin123
-```
+
 
 If no admin with `ADMIN_EMAIL` exists, it will be created and you will see a log similar to:
 

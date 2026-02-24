@@ -1,23 +1,27 @@
 /**
- * Create Exam and Add Questions
+ * Create Exam - modern UI with document upload for questions
  */
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { createExam, addQuestion } from '../../services/api';
+import { FileText, UploadCloud } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { AdminLayout } from '../../components/layout/AdminLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { createExam, uploadQuestions } from '../../services/api';
 
 export default function CreateExam() {
   const [title, setTitle] = useState('');
   const [skill, setSkill] = useState('');
   const [examId, setExamId] = useState('');
-  const [question, setQuestion] = useState('');
-  const [options, setOptions] = useState(['', '', '', '']);
-  const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [suggestedCount, setSuggestedCount] = useState(20);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleCreateExam = async (e) => {
-    e.preventDefault();
+  const [confirmCreateOpen, setConfirmCreateOpen] = useState(false);
+  const [confirmUploadOpen, setConfirmUploadOpen] = useState(false);
+  const handleCreateExam = async () => {
     setError('');
     setMessage('');
     setLoading(true);
@@ -31,100 +35,196 @@ export default function CreateExam() {
     setLoading(false);
   };
 
-  const handleAddQuestion = async (e) => {
-    e.preventDefault();
+  const handleUploadQuestions = async () => {
     if (!examId) {
       setError('Create an exam first.');
       return;
     }
-    if (!question || options.some((o) => !o.trim())) {
-      setError('Question and all 4 options are required.');
+    if (!uploadFile) {
+      setError('Please upload a .txt or .docx file.');
       return;
     }
     setError('');
     setMessage('');
     setLoading(true);
+
     try {
-      await addQuestion({
-        examId,
-        question: question.trim(),
-        options: options.map((o) => o.trim()),
-        correctAnswer,
-      });
-      setMessage('Question added.');
-      setQuestion('');
-      setOptions(['', '', '', '']);
-      setCorrectAnswer(0);
+      const formData = new FormData();
+      formData.append('examId', examId);
+      formData.append('suggestedCount', suggestedCount);
+      formData.append('file', uploadFile);
+
+      const { data } = await uploadQuestions(formData);
+      setMessage(data.message || 'Questions uploaded successfully.');
+      toast.success(data.message || 'Questions uploaded successfully.');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to add question');
+      setError(err.response?.data?.message || 'Failed to upload questions');
+      toast.error('Failed to upload questions');
     }
     setLoading(false);
   };
 
   return (
-    <>
-      <nav className="navbar">
-        <span>Create Exam</span>
-        <Link to="/admin/dashboard" className="btn btn-secondary" style={{ color: '#fff' }}>Dashboard</Link>
-      </nav>
-      <div className="container">
-        <h1 className="page-title">Create Exam & Add Questions</h1>
+    <AdminLayout title="Create Exam">
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader className="flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-300">
+              <FileText className="h-4 w-4" />
+            </div>
+            <div>
+              <CardTitle>Create Exam</CardTitle>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Define the basic details of your exam.
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setConfirmCreateOpen(true);
+              }}
+              className="space-y-3 text-sm"
+            >
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
+                  Title
+                </label>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  placeholder="e.g. JavaScript Basics"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
+                  Skill
+                </label>
+                <input
+                  value={skill}
+                  onChange={(e) => setSkill(e.target.value)}
+                  required
+                  placeholder="e.g. JavaScript"
+                  className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50"
+                />
+              </div>
 
-        <div className="card">
-          <h2 style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>Step 1: Create Exam</h2>
-          <form onSubmit={handleCreateExam}>
-            <div className="form-group">
-              <label>Title</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. JavaScript Basics" />
-            </div>
-            <div className="form-group">
-              <label>Skill</label>
-              <input value={skill} onChange={(e) => setSkill(e.target.value)} required placeholder="e.g. JavaScript" />
-            </div>
-            {message && <p className="success-msg">{message}</p>}
-            {error && <p className="error-msg">{error}</p>}
-            <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Creating...' : 'Create Exam'}</button>
-          </form>
-        </div>
+              {message && (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                  {message}
+                </p>
+              )}
+              {error && (
+                <p className="text-xs text-red-600 dark:text-red-400">
+                  {error}
+                </p>
+              )}
+
+              <Button type="submit" disabled={loading} className="mt-1">
+                {loading ? 'Creating…' : 'Create Exam'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         {examId && (
-          <div className="card">
-            <h2 style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>Step 2: Add Questions (MCQ - 4 options)</h2>
-            <form onSubmit={handleAddQuestion}>
-              <div className="form-group">
-                <label>Question</label>
-                <textarea value={question} onChange={(e) => setQuestion(e.target.value)} required rows={2} placeholder="Enter question text" />
+          <Card>
+            <CardHeader className="flex items-center gap-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-300">
+                <UploadCloud className="h-4 w-4" />
               </div>
-              {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="form-group">
-                  <label>Option {i + 1}</label>
+              <div>
+                <CardTitle>Upload Questions Document</CardTitle>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Upload a .txt or .docx file. Each line should be:
+                  <br />
+                  <span className="font-mono text-[11px]">
+                    Question | Option 1 | Option 2 | Option 3 | Option 4 | CorrectOption(1-4)
+                  </span>
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setConfirmUploadOpen(true);
+                }}
+                className="space-y-3 text-sm"
+              >
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
+                    Upload file
+                  </label>
                   <input
-                    value={options[i] || ''}
-                    onChange={(e) => {
-                      const next = [...options];
-                      next[i] = e.target.value;
-                      setOptions(next);
-                    }}
-                    placeholder={`Option ${i + 1}`}
+                    type="file"
+                    accept=".txt,.docx"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                    className="block w-full cursor-pointer text-xs text-slate-500 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-primary-600 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-white hover:file:bg-primary-500 dark:text-slate-400"
                   />
                 </div>
-              ))}
-              <div className="form-group">
-                <label>Correct Answer (Option number 1-4)</label>
-                <select value={correctAnswer} onChange={(e) => setCorrectAnswer(Number(e.target.value))}>
-                  <option value={0}>Option 1</option>
-                  <option value={1}>Option 2</option>
-                  <option value={2}>Option 3</option>
-                  <option value={3}>Option 4</option>
-                </select>
-              </div>
-              {error && <p className="error-msg">{error}</p>}
-              {message && <p className="success-msg">{message}</p>}
-              <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Adding...' : 'Add Question'}</button>
-            </form>
-          </div>
+
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">
+                    Number of questions (suggestions)
+                  </label>
+                  <select
+                    value={suggestedCount}
+                    onChange={(e) => setSuggestedCount(Number(e.target.value))}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50"
+                  >
+                    <option value={20}>20 questions</option>
+                    <option value={50}>50 questions</option>
+                    <option value={100}>100 questions</option>
+                  </select>
+                </div>
+
+                {error && (
+                  <p className="text-xs text-red-600 dark:text-red-400">
+                    {error}
+                  </p>
+                )}
+                {message && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    {message}
+                  </p>
+                )}
+
+                <Button type="submit" disabled={loading} className="mt-1">
+                  {loading ? 'Uploading…' : 'Upload & Create Questions'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         )}
       </div>
-    </>
+      <ConfirmDialog
+        open={confirmCreateOpen}
+        title="Create this exam?"
+        description="You can still upload questions after creating the exam."
+        confirmLabel="Create exam"
+        cancelLabel="Cancel"
+        onConfirm={async () => {
+          setConfirmCreateOpen(false);
+          await handleCreateExam();
+        }}
+        onCancel={() => setConfirmCreateOpen(false)}
+      />
+      <ConfirmDialog
+        open={confirmUploadOpen}
+        title="Upload questions for this exam?"
+        description="The questions from your file will be stored for this exam."
+        confirmLabel="Upload"
+        cancelLabel="Cancel"
+        onConfirm={async () => {
+          setConfirmUploadOpen(false);
+          await handleUploadQuestions();
+        }}
+        onCancel={() => setConfirmUploadOpen(false)}
+      />
+    </AdminLayout>
   );
 }
