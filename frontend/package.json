@@ -8,6 +8,7 @@
     "class-variance-authority": "^0.7.0",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.466.0",
+    "@monaco-editor/react": "^4.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",

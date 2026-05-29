@@ -20,6 +20,8 @@ import CreateExam from './pages/admin/CreateExam';
 import AssignExam from './pages/admin/AssignExam';
 import Responses from './pages/admin/Responses';
 import AdminExams from './pages/admin/AdminExams';
+import AdminCodingProblems from './pages/admin/AdminCodingProblems';
+import CodingExam from './pages/CodingExam';
 
 // Protected route wrapper - redirect to login if no token or wrong role
 const UserRoute = ({ children }) => {
@@ -63,6 +65,14 @@ function App() {
         }
       />
       <Route
+        path="/coding/:problemId"
+        element={
+          <UserRoute>
+            <CodingExam />
+          </UserRoute>
+        }
+      />
+      <Route
         path="/result"
         element={
           <UserRoute>
@@ -94,6 +104,14 @@ function App() {
         element={
           <AdminRoute>
             <AdminExams />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/coding"
+        element={
+          <AdminRoute>
+            <AdminCodingProblems />
           </AdminRoute>
         }
       />

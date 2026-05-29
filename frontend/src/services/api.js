@@ -36,10 +36,29 @@ export const assignExam = (data) => api.post('/admin/assign', data);
 export const getResponses = (params) => api.get('/admin/responses', { params });
 export const getScore = (responseId) => api.post('/admin/get-score', { responseId });
 
+// Admin coding APIs
+export const listCodingProblems = () => api.get('/coding/problems');
+export const createCodingProblem = (data) => api.post('/coding/problems', data);
+export const getCodingProblemDetail = (id) => api.get(`/coding/problems/${id}`);
+export const getProblemSubmissions = (id) =>
+  api.get(`/coding/problems/${id}/submissions`);
+export const setSubmissionMarks = (id, marks) =>
+  api.post(`/coding/submissions/${id}/marks`, { marks });
+export const publishSubmission = (id) =>
+  api.post(`/coding/submissions/${id}/publish`);
+
 // User APIs (requires user token)
 export const getMyExams = () => api.get('/user/exams');
 export const getExam = (id) => api.get(`/user/exam/${id}`);
 export const submitExam = (data) => api.post('/user/submit', data);
 export const getResult = (examId) => api.get(`/user/result/${examId}`);
+
+// Candidate coding APIs
+export const getCodingProblemForUser = (id) =>
+  api.get(`/coding/problems/${id}/view`);
+export const runCandidateCode = (id, payload) =>
+  api.post(`/coding/problems/${id}/run`, payload);
+export const submitCandidateCode = (id, payload) =>
+  api.post(`/coding/problems/${id}/submit`, payload);
 
 export default api;

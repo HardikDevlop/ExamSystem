@@ -11,12 +11,14 @@ import {
   ClipboardList,
   UserCircle2,
   BookOpenText,
+  Code2,
 } from "lucide-react";
 
 const adminLinks = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/create-exam", label: "Create Exam", icon: FilePlus2 },
   { to: "/admin/exams", label: "Exams", icon: BookOpenText },
+  { to: "/admin/coding", label: "Coding Problems", icon: Code2 },
   { to: "/admin/assign", label: "Assign Exam", icon: Users },
   { to: "/admin/responses", label: "Responses", icon: FileText },
 ];
