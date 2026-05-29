@@ -8,6 +8,7 @@ const upload = require('../middleware/upload');
 const {
   getExams,
   getUsers,
+  deleteUser,
   getExamDetail,
   createExam,
   deleteExam,
@@ -24,6 +25,7 @@ router.use(adminOnly);
 router.get('/exams', getExams);
 router.get('/exam/:id', getExamDetail);
 router.get('/users', getUsers);
+router.delete('/users/:id', deleteUser);
 router.post('/exam', createExam);
 router.delete('/exam/:id', deleteExam);
 router.post('/question', addQuestion);

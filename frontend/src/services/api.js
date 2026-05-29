@@ -32,6 +32,8 @@ export const uploadQuestions = (formData) =>
   });
 export const getAdminExamDetail = (id) => api.get(`/admin/exam/${id}`);
 export const deleteExam = (id) => api.delete(`/admin/exam/${id}`);
+export const getAdminUsers = () => api.get('/admin/users');
+export const deleteAdminUser = (id) => api.delete(`/admin/users/${id}`);
 export const assignExam = (data) => api.post('/admin/assign', data);
 export const getResponses = (params) => api.get('/admin/responses', { params });
 export const getScore = (responseId) => api.post('/admin/get-score', { responseId });

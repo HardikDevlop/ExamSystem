@@ -19,6 +19,7 @@ const adminLinks = [
   { to: "/admin/create-exam", label: "Create Exam", icon: FilePlus2 },
   { to: "/admin/exams", label: "Exams", icon: BookOpenText },
   { to: "/admin/coding", label: "Coding Problems", icon: Code2 },
+  { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/assign", label: "Assign Exam", icon: Users },
   { to: "/admin/responses", label: "Responses", icon: FileText },
 ];

@@ -95,8 +95,10 @@ exports.getResult = async (req, res) => {
         response: {
           _id: response._id,
           examId: response.examId,
+          userId: response.userId,
           score: null,
           totalMarks: null,
+          submittedAt: response.createdAt,
           evaluatedAt: null,
         },
       });
@@ -106,8 +108,10 @@ exports.getResult = async (req, res) => {
       response: {
         _id: response._id,
         examId: response.examId,
+        userId: response.userId,
         score: response.score,
         totalMarks: response.totalMarks,
+        submittedAt: response.createdAt,
         evaluatedAt: response.evaluatedAt,
       },
     });

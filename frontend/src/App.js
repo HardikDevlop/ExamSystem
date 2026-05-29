@@ -20,6 +20,7 @@ import CreateExam from './pages/admin/CreateExam';
 import AssignExam from './pages/admin/AssignExam';
 import Responses from './pages/admin/Responses';
 import AdminExams from './pages/admin/AdminExams';
+import AdminUsers from './pages/admin/AdminUsers';
 import AdminCodingProblems from './pages/admin/AdminCodingProblems';
 import CodingExam from './pages/CodingExam';
 
@@ -104,6 +105,14 @@ function App() {
         element={
           <AdminRoute>
             <AdminExams />
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminRoute>
+            <AdminUsers />
           </AdminRoute>
         }
       />

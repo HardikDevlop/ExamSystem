@@ -110,6 +110,11 @@ export default function AdminDashboard() {
                   Assign Exam to Users
                 </Button>
               </Link>
+              <Link to="/admin/users">
+                <Button className="w-full justify-start" variant="secondary">
+                  Manage Users
+                </Button>
+              </Link>
               <Link to="/admin/responses">
                 <Button className="w-full justify-start" variant="secondary">
                   View Submissions & Get Score

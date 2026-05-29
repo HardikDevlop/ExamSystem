@@ -9,6 +9,7 @@ const Exam = require('../models/Exam');
 const Question = require('../models/Question');
 const Response = require('../models/Response');
 const User = require('../models/User');
+const Submission = require('../models/Submission');
 
 // GET /api/admin/exams - List all exams (for assign page)
 exports.getExams = async (req, res) => {
@@ -44,6 +45,31 @@ exports.getUsers = async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Failed to fetch users' });
+  }
+};
+
+// DELETE /api/admin/users/:id - Delete a candidate and related candidate data
+exports.deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role === 'admin') {
+      return res.status(400).json({ message: 'Admin accounts cannot be deleted here' });
+    }
+
+    await Exam.updateMany(
+      { assignedUsers: user._id },
+      { $pull: { assignedUsers: user._id } }
+    );
+    await Response.deleteMany({ userId: user._id });
+    await Submission.deleteMany({ userId: user._id });
+    await user.deleteOne();
+
+    res.json({ message: 'User and related records deleted successfully.' });
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Failed to delete user' });
   }
 };
 
