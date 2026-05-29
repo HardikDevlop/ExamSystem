@@ -15,7 +15,17 @@ const codingRoutes = require('./routes/codingRoutes');
 connectDB();
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = process.env.FRONTEND_URL
+  ? process.env.FRONTEND_URL.split(',').map((origin) => origin.trim())
+  : [];
+
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : true,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 // API Routes
