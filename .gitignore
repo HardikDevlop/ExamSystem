@@ -7,7 +7,7 @@ node_modules/
 .env.*.local
 
 # Build / output
-frontend
+
 *.log
 npm-debug.log*
 
